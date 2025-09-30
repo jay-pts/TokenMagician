@@ -130,15 +130,15 @@ public partial class GetMsiToken : DependencyCmdlet<Startup>
         var tokenCredential = new ClientAssertionCredential(TenantId, ClientId, (_) => Task.FromResult(msiToken.Value.Token));
 
         // Fix the scope
-        if (!Scope!.EndsWith("/.default"))
-        {
-            Scope += "/.default";
-        }
+        // if (!Scope!.EndsWith("/.default"))
+        // {
+        //     Scope += "/.default";
+        // }
 
         // Get a token for the requested scope
         try
         {
-            var scopeToken = await tokenCredential.GetTokenAsync(new TokenRequestContext(new[] { Scope! }), cancellationToken);
+            var scopeToken = await tokenCredential.GetTokenAsync(new TokenRequestContext(Scope!.Split(',').Select(s => s.Trim()).ToArray()), cancellationToken);
             _logger?.LogInformation("Got access token for {Tenant} that expires at {ExpiresAt}", TenantId, scopeToken.ExpiresOn);
 
             if (DecodeToken)
